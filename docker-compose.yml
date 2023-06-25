@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    ports:
+      - ${POSTGRES_PORT}:5432
+
+  app:
+    build: .
+    container_name: ${PROJECT_NAME}
+    image: ${BUILD_IMAGE}
+    env_file:
+      - .env
+    ports:
+      - ${HTTP_PORT}:${HTTP_PORT}
+    depends_on:
+      - postgres
+      
+volumes:
+  pg-data:
