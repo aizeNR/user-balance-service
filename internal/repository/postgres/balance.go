@@ -21,14 +21,33 @@ func NewUserBalanceRepository(conn postgresql.ConnManager) *UserBalanceRepositor
 
 const userBalanceTable = "user_balance"
 
-func (u *UserBalanceRepository) Add(ctx context.Context, userID uint64, amount int64) error {
+func (u *UserBalanceRepository) Add(ctx context.Context, userID uint64, amount uint64) error {
 	sql := `
 	INSERT INTO user_balance 
 	VALUES ($1, $2) 
-	ON CONFLICT (user_id) DO UPDATE SET balance = user.balance + excluded.balance
+	ON CONFLICT (user_id) DO UPDATE SET balance = user_balance.balance + excluded.balance
 	`
 
 	cmdTag, err := u.conn.Conn(ctx).Exec(ctx, sql, userID, amount); 
+	if err != nil {
+		return fmt.Errorf("failed execute query: %w", err)
+	}
+
+	// TODO CHECK THIS
+	if cmdTag.RowsAffected() == 0 {
+		// TODO return error
+		return nil
+	}
+
+	return nil
+}
+
+func (u *UserBalanceRepository) Down(ctx context.Context, userID uint64, amount uint64) error {
+	sql := `
+	UPDATE user_balance SET balance = balance - $1 WHERE user_id = $2
+	`
+
+	cmdTag, err := u.conn.Conn(ctx).Exec(ctx, sql, amount, userID); 
 	if err != nil {
 		return fmt.Errorf("failed execute query: %w", err)
 	}

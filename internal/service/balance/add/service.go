@@ -11,7 +11,7 @@ import (
 )
 
 type balanceRepository interface {
-	Add(ctx context.Context, userID uint64, amount int64) error
+	Add(ctx context.Context, userID uint64, amount uint64) error
 }
 
 type transactionRepository interface {
@@ -36,12 +36,13 @@ func NewService(
 	}
 }
 
-func (u *Service) Add(ctx context.Context, userID uint64, amount int64) error {
+func (u *Service) Add(ctx context.Context, userID uint64, amount uint64) error {
 	return u.txManager.RunTx(ctx, func(ctx context.Context) error {
 		if err := u.balanceRepo.Add(ctx, userID, amount); err != nil {
 			return fmt.Errorf("balanceRepo.Add: %w", err)
 		}
 
+		// TODO interface to generator
 		transactionID, err := uuid.NewV4()
 		if err != nil {
 			return err
@@ -50,7 +51,7 @@ func (u *Service) Add(ctx context.Context, userID uint64, amount int64) error {
 		err = u.transactionRepo.Add(ctx, model.Transaction{
 			ID: transactionID,
 			UserID: userID,
-			Amount: amount,
+			Amount: int64(amount),
 			OperationDate: clock.Now(),
 		})
 		if err != nil {

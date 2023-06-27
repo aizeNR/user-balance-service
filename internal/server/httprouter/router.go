@@ -5,11 +5,22 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func Init() *chi.Mux {
+const jsonType = "application/json"
+
+type Router struct {
+	*chi.Mux
+}
+
+func Init() *Router {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 
-	return r
+	// TODO refactor
+	r.Use(middleware.SetHeader("Content-Type", jsonType))
+
+	return &Router{
+		r,
+	}
 }

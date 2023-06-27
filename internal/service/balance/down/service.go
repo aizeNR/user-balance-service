@@ -12,7 +12,7 @@ import (
 )
 
 type balanceRepository interface {
-	Add(ctx context.Context, userID uint64, amount int64) error
+	Down(ctx context.Context, userID uint64, amount uint64) error
 	GetByUserID(ctx context.Context, userID uint64) (model.UserBalance, error)
 }
 
@@ -38,7 +38,7 @@ func NewService(
 	}
 }
 
-func (u *Service) Down(ctx context.Context, userID uint64, amount int64) error {
+func (u *Service) Down(ctx context.Context, userID uint64, amount uint64) error {
 	return u.txManager.RunTx(ctx, func(ctx context.Context) error {
 		balance, err := u.balanceRepo.GetByUserID(ctx, userID)
 		if err != nil {
@@ -46,14 +46,15 @@ func (u *Service) Down(ctx context.Context, userID uint64, amount int64) error {
 			return fmt.Errorf("balanceRepo.GetByUserID: %w", err)
 		}
 
-		if int64(balance.Balance) - amount < 0 {
-			return errx.ErrNotEnoughtMoney
+		if int64(balance.Balance) - int64(amount) < 0 {
+			return &errx.ErrNotEnoughtMoney{}
 		}
 
-		if err := u.balanceRepo.Add(ctx, userID, amount); err != nil {
+		if err := u.balanceRepo.Down(ctx, userID, amount); err != nil {
 			return fmt.Errorf("balanceRepo.Add: %w", err)
 		}
 
+		// TODO interface to generator
 		transactionID, err := uuid.NewV4()
 		if err != nil {
 			return err
@@ -62,7 +63,7 @@ func (u *Service) Down(ctx context.Context, userID uint64, amount int64) error {
 		err = u.transactionRepo.Add(ctx, model.Transaction{
 			ID: transactionID,
 			UserID: userID,
-			Amount: amount,
+			Amount: (-1 * int64(amount)),
 			OperationDate: clock.Now(),
 		})
 		if err != nil {

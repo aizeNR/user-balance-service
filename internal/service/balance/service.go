@@ -4,11 +4,11 @@ import "context"
 
 
 type addAction interface {
-	Add(ctx context.Context, userID uint64, amount int64) error
+	Add(ctx context.Context, userID uint64, amount uint64) error
 }
 
 type downAction interface {
-	Down(ctx context.Context, userID uint64, amount int64) error
+	Down(ctx context.Context, userID uint64, amount uint64) error
 }
 
 type Service struct {

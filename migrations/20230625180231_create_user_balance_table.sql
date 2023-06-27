@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE user_balance(
     user_id bigint PRIMARY KEY,
-    balance bigint not null
+    balance bigint not null CHECK (balance >= 0)
 );
 -- +goose StatementEnd
 
