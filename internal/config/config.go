@@ -8,13 +8,13 @@ import (
 
 type (
 	Config struct {
-		App            App
-		Postgres       Postgres
-		HTTP           HTTP
+		App      App
+		Postgres Postgres
+		HTTP     HTTP
 	}
 
 	Postgres struct {
-		URL         string `env:"POSTGRES_URL" env-required:"true"`
+		URL string `env:"POSTGRES_URL" env-required:"true"`
 	}
 
 	HTTP struct {

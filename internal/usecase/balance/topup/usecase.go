@@ -6,7 +6,7 @@ import (
 )
 
 type balanceService interface {
-	Add(ctx context.Context, userID uint64, amount uint64) error
+	Add(ctx context.Context, userID, amount uint64) error
 }
 
 type UseCase struct {
@@ -21,7 +21,7 @@ func New(
 	}
 }
 
-func (u *UseCase) TopUp(ctx context.Context, userID uint64, amount uint64) error {
+func (u *UseCase) TopUp(ctx context.Context, userID, amount uint64) error {
 	if err := u.balanceSvc.Add(ctx, userID, amount); err != nil {
 		return fmt.Errorf("balanceSvc.Add: %w", err)
 	}

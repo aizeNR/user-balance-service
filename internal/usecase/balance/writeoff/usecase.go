@@ -6,7 +6,7 @@ import (
 )
 
 type balanceService interface {
-	Down(ctx context.Context, userID uint64, amount uint64) error
+	Down(ctx context.Context, userID, amount uint64) error
 }
 
 type UseCase struct {
@@ -21,7 +21,7 @@ func New(
 	}
 }
 
-func (u *UseCase) WriteOff(ctx context.Context, userID uint64, amount uint64) error {
+func (u *UseCase) WriteOff(ctx context.Context, userID, amount uint64) error {
 	if err := u.balanceSvc.Down(ctx, userID, amount); err != nil {
 		return fmt.Errorf("balanceSvc.Add: %w", err)
 	}

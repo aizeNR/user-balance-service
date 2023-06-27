@@ -7,8 +7,8 @@ import (
 )
 
 type Transaction struct {
-	ID uuid.UUID
-	UserID uint64
-	Amount int64
+	ID            uuid.UUID
+	UserID        uint64
+	Amount        int64
 	OperationDate time.Time
-} 
+}

@@ -22,12 +22,12 @@ const transactionTable = "transactions"
 
 func (t *TransactionRepository) Add(ctx context.Context, transaction model.Transaction) error {
 	sql, args, err := postgresql.Builder.Insert(transactionTable).
-	Columns(
-		"id",
-		"user_id",
-		"amount",
-		"operation_date",
-	).Values(
+		Columns(
+			"id",
+			"user_id",
+			"amount",
+			"operation_date",
+		).Values(
 		transaction.ID,
 		transaction.UserID,
 		transaction.Amount,
@@ -37,7 +37,7 @@ func (t *TransactionRepository) Add(ctx context.Context, transaction model.Trans
 		return fmt.Errorf("failed execute query: %w", err)
 	}
 
-	cmdTag, err := t.conn.Conn(ctx).Exec(ctx, sql, args...); 
+	cmdTag, err := t.conn.Conn(ctx).Exec(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("failed execute query: %w", err)
 	}

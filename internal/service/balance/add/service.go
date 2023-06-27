@@ -11,7 +11,7 @@ import (
 )
 
 type balanceRepository interface {
-	Add(ctx context.Context, userID uint64, amount uint64) error
+	Add(ctx context.Context, userID, amount uint64) error
 }
 
 type transactionRepository interface {
@@ -19,9 +19,9 @@ type transactionRepository interface {
 }
 
 type Service struct {
-	balanceRepo balanceRepository
+	balanceRepo     balanceRepository
 	transactionRepo transactionRepository
-	txManager postgresql.TransactionManager
+	txManager       postgresql.TransactionManager
 }
 
 func NewService(
@@ -30,13 +30,13 @@ func NewService(
 	txManager postgresql.TransactionManager,
 ) *Service {
 	return &Service{
-		balanceRepo: balanceRepo,
+		balanceRepo:     balanceRepo,
 		transactionRepo: transactionRepo,
-		txManager: txManager,
+		txManager:       txManager,
 	}
 }
 
-func (u *Service) Add(ctx context.Context, userID uint64, amount uint64) error {
+func (u *Service) Add(ctx context.Context, userID, amount uint64) error {
 	return u.txManager.RunTx(ctx, func(ctx context.Context) error {
 		if err := u.balanceRepo.Add(ctx, userID, amount); err != nil {
 			return fmt.Errorf("balanceRepo.Add: %w", err)
@@ -49,9 +49,9 @@ func (u *Service) Add(ctx context.Context, userID uint64, amount uint64) error {
 		}
 
 		err = u.transactionRepo.Add(ctx, model.Transaction{
-			ID: transactionID,
-			UserID: userID,
-			Amount: int64(amount),
+			ID:            transactionID,
+			UserID:        userID,
+			Amount:        int64(amount),
 			OperationDate: clock.Now(),
 		})
 		if err != nil {
@@ -60,5 +60,4 @@ func (u *Service) Add(ctx context.Context, userID uint64, amount uint64) error {
 
 		return nil
 	})
-	
 }

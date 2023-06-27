@@ -8,19 +8,19 @@ import (
 )
 
 type balanceService interface {
-	Add(ctx context.Context, userID uint64, amount uint64) error
-	Down(ctx context.Context, userID uint64, amount uint64) error
+	Add(ctx context.Context, userID, amount uint64) error
+	Down(ctx context.Context, userID, amount uint64) error
 }
 
 type Request struct {
 	ReceiverID uint64
-	SenderID uint64
-	Amount uint64
+	SenderID   uint64
+	Amount     uint64
 }
 
 type UseCase struct {
 	balanceSvc balanceService
-	txManager postgresql.TransactionManager
+	txManager  postgresql.TransactionManager
 }
 
 func New(
@@ -29,7 +29,7 @@ func New(
 ) *UseCase {
 	return &UseCase{
 		balanceSvc: balanceSvc,
-		txManager: txManager,
+		txManager:  txManager,
 	}
 }
 

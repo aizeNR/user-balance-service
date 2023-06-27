@@ -12,7 +12,7 @@ import (
 )
 
 type balanceRepository interface {
-	Down(ctx context.Context, userID uint64, amount uint64) error
+	Down(ctx context.Context, userID, amount uint64) error
 	GetByUserID(ctx context.Context, userID uint64) (model.UserBalance, error)
 }
 
@@ -21,9 +21,9 @@ type transactionRepository interface {
 }
 
 type Service struct {
-	balanceRepo balanceRepository
+	balanceRepo     balanceRepository
 	transactionRepo transactionRepository
-	txManager postgresql.TransactionManager
+	txManager       postgresql.TransactionManager
 }
 
 func NewService(
@@ -32,21 +32,20 @@ func NewService(
 	txManager postgresql.TransactionManager,
 ) *Service {
 	return &Service{
-		balanceRepo: balanceRepo,
+		balanceRepo:     balanceRepo,
 		transactionRepo: transactionRepo,
-		txManager: txManager,
+		txManager:       txManager,
 	}
 }
 
-func (u *Service) Down(ctx context.Context, userID uint64, amount uint64) error {
+func (u *Service) Down(ctx context.Context, userID, amount uint64) error {
 	return u.txManager.RunTx(ctx, func(ctx context.Context) error {
 		balance, err := u.balanceRepo.GetByUserID(ctx, userID)
 		if err != nil {
-			// TODO error no rows
 			return fmt.Errorf("balanceRepo.GetByUserID: %w", err)
 		}
 
-		if int64(balance.Balance) - int64(amount) < 0 {
+		if int64(balance.Balance)-int64(amount) < 0 {
 			return &errx.ErrNotEnoughtMoney{}
 		}
 
@@ -61,9 +60,9 @@ func (u *Service) Down(ctx context.Context, userID uint64, amount uint64) error 
 		}
 
 		err = u.transactionRepo.Add(ctx, model.Transaction{
-			ID: transactionID,
-			UserID: userID,
-			Amount: (-1 * int64(amount)),
+			ID:            transactionID,
+			UserID:        userID,
+			Amount:        (-1 * int64(amount)),
 			OperationDate: clock.Now(),
 		})
 		if err != nil {

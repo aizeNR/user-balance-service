@@ -22,7 +22,7 @@ func main() {
 	doneCh := make(chan os.Signal, len(signals))
 
 	signal.Notify(doneCh, signals...)
-	
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -41,7 +41,7 @@ func main() {
 	defer db.Close()
 
 	txManager := postgresql.NewTxManager(db)
-	
+
 	// Usecase
 	balanceService := service.InitBalance(&service.BalanceDeps{
 		TxManager: txManager,
@@ -49,7 +49,7 @@ func main() {
 
 	ucBalance := usecase.InitBalance(&usecase.BalanceDeps{
 		BalanceService: balanceService,
-		TxManager: txManager,
+		TxManager:      txManager,
 	})
 
 	router := httprouter.Init()
@@ -59,7 +59,7 @@ func main() {
 	balanceServer.Register(router)
 
 	httpServer := httpserver.New(router, httpserver.Port(cfg.HTTP.GetPort()))
-	
+
 	defer func() {
 		err = httpServer.Shutdown()
 		if err != nil {
@@ -74,4 +74,3 @@ func main() {
 		logger.Error().Err(err).Msg("httpServer.Notify")
 	}
 }
-
