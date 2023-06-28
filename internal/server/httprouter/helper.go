@@ -4,9 +4,43 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/aizeNR/user-balance-service/internal/errx"
 )
+
+const (
+	_defaultPage  = 1
+	_defaultLimit = 20
+)
+
+func ExtractPage(r *http.Request) uint64 {
+	page := r.URL.Query().Get("page")
+	if page == "" {
+		return _defaultPage
+	}
+
+	intPage, err := strconv.ParseUint(page, 10, 64)
+	if err != nil {
+		return _defaultPage
+	}
+
+	return intPage
+}
+
+func ExtractLimit(r *http.Request) uint64 {
+	page := r.URL.Query().Get("limit")
+	if page == "" {
+		return _defaultLimit
+	}
+
+	intPage, err := strconv.ParseUint(page, 10, 64)
+	if err != nil {
+		return _defaultLimit
+	}
+
+	return intPage
+}
 
 func SendJSONError(w http.ResponseWriter, err error) {
 	var serviceError errx.ServiceError

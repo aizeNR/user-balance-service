@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/aizeNR/user-balance-service/internal/model"
+	"github.com/aizeNR/user-balance-service/internal/repository"
 	"github.com/aizeNR/user-balance-service/pkg/postgresql"
 )
 
@@ -15,6 +16,7 @@ type balanceRepository interface {
 
 type transactionRepository interface {
 	Add(ctx context.Context, transaction model.Transaction) error
+	GetList(ctx context.Context, r repository.GetTransactionsRequest) ([]model.Transaction, error)
 }
 
 type Service struct {

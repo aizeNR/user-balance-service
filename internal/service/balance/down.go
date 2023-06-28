@@ -32,7 +32,7 @@ func (s *Service) Down(ctx context.Context, r DownRequest) error {
 		}
 
 		// TODO interface to id generator
-		transactionID, err := uuid.NewV4()
+		transactionID, err := uuid.NewV7()
 		if err != nil {
 			return err
 		}

@@ -13,3 +13,8 @@ type Transaction struct {
 	OperationDate time.Time
 	Comment       string
 }
+
+type TransactionSortFields struct {
+	Amount        SortDirection
+	OperationDate SortDirection
+}

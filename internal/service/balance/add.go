@@ -22,7 +22,7 @@ func (s *Service) Add(ctx context.Context, r AddRequest) error {
 		}
 
 		// TODO interface to generator
-		transactionID, err := uuid.NewV4()
+		transactionID, err := uuid.NewV7()
 		if err != nil {
 			return err
 		}
