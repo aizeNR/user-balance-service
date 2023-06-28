@@ -4,15 +4,17 @@ import (
 	"context"
 
 	"github.com/aizeNR/user-balance-service/internal/model"
+	"github.com/aizeNR/user-balance-service/internal/usecase/balance/topup"
 	"github.com/aizeNR/user-balance-service/internal/usecase/balance/transfer"
+	"github.com/aizeNR/user-balance-service/internal/usecase/balance/writeoff"
 )
 
 type topUpAction interface {
-	TopUp(ctx context.Context, userID, amount uint64) error
+	TopUp(ctx context.Context, r topup.Request) error
 }
 
 type writeOffAction interface {
-	WriteOff(ctx context.Context, userID, amount uint64) error
+	WriteOff(ctx context.Context, r writeoff.Request) error
 }
 
 type transferAction interface {

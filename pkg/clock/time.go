@@ -2,7 +2,7 @@ package clock
 
 import "time"
 
-// TODO mock
+// TODO mock.
 func Now() time.Time {
 	return time.Now()
 }

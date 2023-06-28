@@ -8,7 +8,7 @@ import (
 	"github.com/aizeNR/user-balance-service/internal/errx"
 )
 
-func SendJsonError(w http.ResponseWriter, err error) {
+func SendJSONError(w http.ResponseWriter, err error) {
 	var serviceError errx.ServiceError
 
 	if !errors.As(err, &serviceError) {

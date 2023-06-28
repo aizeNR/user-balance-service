@@ -3,10 +3,18 @@ package writeoff
 import (
 	"context"
 	"fmt"
+
+	"github.com/aizeNR/user-balance-service/internal/service/balance"
 )
 
+type Request struct {
+	UserID  uint64
+	Amount  uint64
+	Comment string
+}
+
 type balanceService interface {
-	Down(ctx context.Context, userID, amount uint64) error
+	Down(ctx context.Context, r balance.DownRequest) error
 }
 
 type UseCase struct {
@@ -21,8 +29,12 @@ func New(
 	}
 }
 
-func (u *UseCase) WriteOff(ctx context.Context, userID, amount uint64) error {
-	if err := u.balanceSvc.Down(ctx, userID, amount); err != nil {
+func (u *UseCase) WriteOff(ctx context.Context, r Request) error {
+	if err := u.balanceSvc.Down(ctx, balance.DownRequest{
+		UserID:  r.UserID,
+		Amount:  r.Amount,
+		Comment: r.Comment,
+	}); err != nil {
 		return fmt.Errorf("balanceSvc.Add: %w", err)
 	}
 

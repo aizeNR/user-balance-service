@@ -1,0 +1,89 @@
+run:
+  timeout: 5m
+  skip-dirs:
+    - generated
+    - vendor
+    - protobuf
+    - mock
+
+linters:
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - depguard
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
+    - gochecknoinits
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - goerr113
+    - goheader
+    - goimports
+    - gomnd
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - importas
+    - ineffassign
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - noctx
+    - nolintlint
+    - paralleltest
+    - prealloc
+    - predeclared
+    - promlinter
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - stylecheck
+    - testpackage
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - wastedassign
+    - whitespace
+
+linters-settings:
+  nolintlint:
+    require-explanation: false
+    require-specific: true
+  gocritic:
+    disabled-checks:
+      - ifElseChain
+  dupl:
+    threshold: 350
+  gofumpt:
+    lang-version: "1.18"
+    module-path: "github.com/aizeNR/user-balance-service"
+    extra-rules: true
+
+issues:
+  exclude-rules:
+    - path: (_test\.go)
+      linters:
+        - forcetypeassert
+        - gosec
+        - noctx
+        - revive
+        - stylecheck

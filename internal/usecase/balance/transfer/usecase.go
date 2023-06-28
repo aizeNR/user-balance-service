@@ -4,18 +4,20 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aizeNR/user-balance-service/internal/service/balance"
 	"github.com/aizeNR/user-balance-service/pkg/postgresql"
 )
 
 type balanceService interface {
-	Add(ctx context.Context, userID, amount uint64) error
-	Down(ctx context.Context, userID, amount uint64) error
+	Add(ctx context.Context, r balance.AddRequest) error
+	Down(ctx context.Context, r balance.DownRequest) error
 }
 
 type Request struct {
 	ReceiverID uint64
 	SenderID   uint64
 	Amount     uint64
+	Comment    string
 }
 
 type UseCase struct {
@@ -35,11 +37,21 @@ func New(
 
 func (u *UseCase) Transfer(ctx context.Context, r Request) error {
 	return u.txManager.RunTx(ctx, func(ctx context.Context) error {
-		if err := u.balanceSvc.Down(ctx, r.SenderID, r.Amount); err != nil {
+		err := u.balanceSvc.Down(ctx, balance.DownRequest{
+			UserID:  r.SenderID,
+			Amount:  r.Amount,
+			Comment: r.Comment,
+		})
+		if err != nil {
 			return fmt.Errorf("balanceSvc.Down: %w", err)
 		}
 
-		if err := u.balanceSvc.Add(ctx, r.ReceiverID, r.Amount); err != nil {
+		err = u.balanceSvc.Add(ctx, balance.AddRequest{
+			UserID:  r.ReceiverID,
+			Amount:  r.Amount,
+			Comment: r.Comment,
+		})
+		if err != nil {
 			return fmt.Errorf("balanceSvc.Add: %w", err)
 		}
 

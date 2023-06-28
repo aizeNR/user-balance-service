@@ -13,9 +13,14 @@ COMPOSE:=$(VARIABLES) && docker-compose -f docker-compose.yml
 
 DOCKER_OPS=--rm -u $(CURRENT_UID):$(CURRENT_GID) --env-file .env
 
+ROOT=`pwd`
+
 .PHONY: build
 build:
 	docker build -t ${BUILD_IMAGE} .
+
+up-db: 
+	${COMPOSE} up --build -d postgres
 
 up: 
 	${COMPOSE} up --build -d postgres app
@@ -59,4 +64,4 @@ generate:
 	go generate ./...
 
 test:
-	go test -cover ./internal/...
+	go test -cover ./internal/... ./pkg/...

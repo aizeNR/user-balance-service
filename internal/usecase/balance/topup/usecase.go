@@ -3,10 +3,18 @@ package topup
 import (
 	"context"
 	"fmt"
+
+	"github.com/aizeNR/user-balance-service/internal/service/balance"
 )
 
+type Request struct {
+	UserID  uint64
+	Amount  uint64
+	Comment string
+}
+
 type balanceService interface {
-	Add(ctx context.Context, userID, amount uint64) error
+	Add(ctx context.Context, r balance.AddRequest) error
 }
 
 type UseCase struct {
@@ -21,8 +29,12 @@ func New(
 	}
 }
 
-func (u *UseCase) TopUp(ctx context.Context, userID, amount uint64) error {
-	if err := u.balanceSvc.Add(ctx, userID, amount); err != nil {
+func (u *UseCase) TopUp(ctx context.Context, r Request) error {
+	if err := u.balanceSvc.Add(ctx, balance.AddRequest{
+		UserID:  r.UserID,
+		Amount:  r.Amount,
+		Comment: r.Comment,
+	}); err != nil {
 		return fmt.Errorf("balanceSvc.Add: %w", err)
 	}
 

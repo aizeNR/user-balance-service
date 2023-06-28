@@ -11,4 +11,5 @@ type Transaction struct {
 	UserID        uint64
 	Amount        int64
 	OperationDate time.Time
+	Comment       string
 }

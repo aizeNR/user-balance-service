@@ -9,14 +9,15 @@ import (
 	"github.com/aizeNR/user-balance-service/internal/errx"
 	"github.com/aizeNR/user-balance-service/internal/model"
 	"github.com/aizeNR/user-balance-service/internal/server/httprouter"
+	"github.com/aizeNR/user-balance-service/internal/usecase/balance/topup"
 	"github.com/aizeNR/user-balance-service/internal/usecase/balance/transfer"
-	"github.com/aizeNR/user-balance-service/pkg/pricehelper"
+	"github.com/aizeNR/user-balance-service/internal/usecase/balance/writeoff"
 	"github.com/go-chi/chi/v5"
 )
 
 type balanceUseCase interface {
-	TopUp(ctx context.Context, userID, amount uint64) error
-	WriteOff(ctx context.Context, userID, amount uint64) error
+	TopUp(ctx context.Context, r topup.Request) error
+	WriteOff(ctx context.Context, r writeoff.Request) error
 	Transfer(ctx context.Context, r transfer.Request) error
 	GetBalance(ctx context.Context, userID uint64) (model.UserBalance, error)
 }
@@ -32,10 +33,10 @@ func NewBalanceServer(ucBalance balanceUseCase) *BalanceServer {
 }
 
 func (b *BalanceServer) Register(router *httprouter.Router) {
-	router.Post("/v1/balance/topup", b.TopUp)
-	router.Post("/v1/balance/writeoff", b.WriteOff)
-	router.Post("/v1/balance/transfer", b.Transfer)
-	router.Get("/v1/{userID}/balance", b.GetBalance)
+	router.Post("/v1/user/balance/topup", b.TopUp)
+	router.Post("/v1/user/balance/writeoff", b.WriteOff)
+	router.Post("/v1/user/balance/transfer", b.Transfer)
+	router.Get("/v1/uset/{userID}/balance", b.GetBalance)
 }
 
 func (b *BalanceServer) TopUp(w http.ResponseWriter, r *http.Request) {
@@ -43,15 +44,19 @@ func (b *BalanceServer) TopUp(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		httprouter.SendJsonError(w, err)
+		httprouter.SendJSONError(w, err)
 		return
 	}
 	defer r.Body.Close()
 
-	// TODO validate
+	// TODO validate.
 
-	if err := b.ucBalance.TopUp(r.Context(), request.UserID, request.Amount); err != nil {
-		httprouter.SendJsonError(w, err)
+	if err := b.ucBalance.TopUp(r.Context(), topup.Request{
+		UserID:  request.UserID,
+		Amount:  request.Amount,
+		Comment: request.Comment,
+	}); err != nil {
+		httprouter.SendJSONError(w, err)
 		return
 	}
 
@@ -63,15 +68,19 @@ func (b *BalanceServer) WriteOff(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		httprouter.SendJsonError(w, err)
+		httprouter.SendJSONError(w, err)
 		return
 	}
 	defer r.Body.Close()
 
-	// TODO validate
+	// TODO validate.
 
-	if err := b.ucBalance.WriteOff(r.Context(), request.UserID, request.Amount); err != nil {
-		httprouter.SendJsonError(w, err)
+	if err := b.ucBalance.WriteOff(r.Context(), writeoff.Request{
+		UserID:  request.UserID,
+		Amount:  request.Amount,
+		Comment: request.Comment,
+	}); err != nil {
+		httprouter.SendJSONError(w, err)
 		return
 	}
 
@@ -83,30 +92,30 @@ func (b *BalanceServer) Transfer(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		httprouter.SendJsonError(w, err)
+		httprouter.SendJSONError(w, err)
 		return
 	}
 	defer r.Body.Close()
 
-	// TODO validate
+	// TODO validate.
 
 	if err := b.ucBalance.Transfer(r.Context(), transfer.Request{
 		ReceiverID: request.RceiverID,
 		SenderID:   request.SenderID,
 		Amount:     request.Amount,
 	}); err != nil {
-		httprouter.SendJsonError(w, err)
+		httprouter.SendJSONError(w, err)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
 }
 
-// TODO refactoring validation
+// TODO refactoring validation.
 func (b *BalanceServer) GetBalance(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	if userID == "" {
-		httprouter.SendJsonError(w, errx.ErrValidation{
+		httprouter.SendJSONError(w, errx.ErrValidation{
 			Fields: map[string]any{
 				"userID": "empty string",
 			},
@@ -116,7 +125,7 @@ func (b *BalanceServer) GetBalance(w http.ResponseWriter, r *http.Request) {
 
 	user, err := strconv.ParseUint(userID, 10, 64)
 	if err != nil {
-		httprouter.SendJsonError(w, errx.ErrValidation{
+		httprouter.SendJSONError(w, errx.ErrValidation{
 			Fields: map[string]any{
 				"userID": "invalid string",
 			},
@@ -126,18 +135,18 @@ func (b *BalanceServer) GetBalance(w http.ResponseWriter, r *http.Request) {
 
 	balance, err := b.ucBalance.GetBalance(r.Context(), user)
 	if err != nil {
-		httprouter.SendJsonError(w, err)
+		httprouter.SendJSONError(w, err)
 		return
 	}
 
 	resp := getBalanceResponse{
-		UserID: balance.UserID,
-		Balance: pricehelper.PennyToRubles(balance.Balance),
+		UserID:  balance.UserID,
+		Balance: balance.Balance,
 	}
 
 	answer, err := json.Marshal(resp)
 	if err != nil {
-		httprouter.SendJsonError(w, err)
+		httprouter.SendJSONError(w, err)
 	}
 
 	w.WriteHeader(http.StatusOK)

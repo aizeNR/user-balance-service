@@ -21,8 +21,6 @@ func NewUserBalanceRepository(conn postgresql.ConnManager) *UserBalanceRepositor
 	}
 }
 
-const userBalanceTable = "user_balance"
-
 func (u *UserBalanceRepository) Add(ctx context.Context, userID, amount uint64) error {
 	sql := `
 	INSERT INTO user_balance 

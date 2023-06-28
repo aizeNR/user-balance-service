@@ -4,30 +4,33 @@ import (
 	"context"
 
 	"github.com/aizeNR/user-balance-service/internal/model"
+	"github.com/aizeNR/user-balance-service/pkg/postgresql"
 )
 
-type addAction interface {
+type balanceRepository interface {
+	Down(ctx context.Context, userID, amount uint64) error
+	GetByUserID(ctx context.Context, userID uint64) (model.UserBalance, error)
 	Add(ctx context.Context, userID, amount uint64) error
 }
 
-type downAction interface {
-	Down(ctx context.Context, userID, amount uint64) error
-}
-
-type getByUserIDAction interface {
-	GetByUserID(ctx context.Context, userID uint64) (model.UserBalance, error)
+type transactionRepository interface {
+	Add(ctx context.Context, transaction model.Transaction) error
 }
 
 type Service struct {
-	addAction
-	downAction
-	getByUserIDAction
+	balanceRepo     balanceRepository
+	transactionRepo transactionRepository
+	txManager       postgresql.TransactionManager
 }
 
-func New(add addAction, down downAction, get getByUserIDAction) *Service {
+func NewService(
+	balanceRepo balanceRepository,
+	transactionRepo transactionRepository,
+	txManager postgresql.TransactionManager,
+) *Service {
 	return &Service{
-		addAction:         add,
-		downAction:        down,
-		getByUserIDAction: get,
+		balanceRepo:     balanceRepo,
+		transactionRepo: transactionRepo,
+		txManager:       txManager,
 	}
 }

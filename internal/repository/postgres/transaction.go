@@ -27,25 +27,21 @@ func (t *TransactionRepository) Add(ctx context.Context, transaction model.Trans
 			"user_id",
 			"amount",
 			"operation_date",
+			"comment",
 		).Values(
 		transaction.ID,
 		transaction.UserID,
 		transaction.Amount,
 		transaction.OperationDate,
+		transaction.Comment,
 	).ToSql()
 	if err != nil {
 		return fmt.Errorf("failed execute query: %w", err)
 	}
 
-	cmdTag, err := t.conn.Conn(ctx).Exec(ctx, sql, args...)
+	_, err = t.conn.Conn(ctx).Exec(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("failed execute query: %w", err)
-	}
-
-	// TODO CHECK THIS
-	if cmdTag.RowsAffected() == 0 {
-		// TODO return error
-		return nil
 	}
 
 	return nil

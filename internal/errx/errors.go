@@ -18,20 +18,6 @@ type WithExtraData interface {
 	GetData() map[string]any
 }
 
-type baseError struct{}
-
-func (b baseError) Error() string {
-	return "Internal server error"
-}
-
-func (b baseError) Code() Code {
-	return InternalError
-}
-
-func (b baseError) Description() string {
-	return ""
-}
-
 func GetData() map[string]any {
 	return nil
 }

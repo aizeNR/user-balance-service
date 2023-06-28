@@ -6,8 +6,6 @@ import (
 	"github.com/aizeNR/user-balance-service/internal/errx"
 )
 
-type validationError struct{}
-
 type httpError struct {
 	Message     string         `json:"message"`
 	Description string         `json:"description"`

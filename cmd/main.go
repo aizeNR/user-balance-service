@@ -10,7 +10,7 @@ import (
 	"github.com/aizeNR/user-balance-service/cmd/wire/usecase"
 	"github.com/aizeNR/user-balance-service/internal/config"
 	"github.com/aizeNR/user-balance-service/internal/server/httprouter"
-	v1 "github.com/aizeNR/user-balance-service/internal/server/httprouter/v1"
+	"github.com/aizeNR/user-balance-service/internal/server/httprouter/v1"
 	"github.com/aizeNR/user-balance-service/pkg/httpserver"
 	"github.com/aizeNR/user-balance-service/pkg/postgresql"
 	"github.com/rs/zerolog"
