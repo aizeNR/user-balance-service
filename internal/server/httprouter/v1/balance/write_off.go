@@ -9,9 +9,9 @@ import (
 )
 
 type writeOffRequest struct {
-	UserID  uint64 `json:"user_id"`
-	Amount  uint64 `json:"amount"`
-	Comment string `json:"comment"`
+	UserID  uint64 `json:"user_id" validate:"required"`
+	Amount  uint64 `json:"amount" validate:"required"`
+	Comment string `json:"comment" validate:"required"`
 }
 
 func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
@@ -22,11 +22,16 @@ func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 		httprouter.SendJSONError(w, err)
 		return
 	}
-	defer r.Body.Close()
 
-	// TODO validate.
+	ctx := r.Context()
 
-	if err := s.ucBalance.WriteOff(r.Context(), writeoff.Request{
+	err = s.validator.StructCtx(ctx, request)
+	if err != nil {
+		httprouter.SendValidationError(w, err)
+		return
+	}
+
+	if err := s.ucBalance.WriteOff(ctx, writeoff.Request{
 		UserID:  request.UserID,
 		Amount:  request.Amount,
 		Comment: request.Comment,

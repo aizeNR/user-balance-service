@@ -12,7 +12,6 @@ type getBalanceResponse struct {
 	Balance uint64 `json:"balance"`
 }
 
-// TODO refactoring validation.
 func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 	userID, err := s.getUserID(r)
 	if err != nil {

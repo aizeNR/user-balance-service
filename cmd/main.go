@@ -13,6 +13,7 @@ import (
 	"github.com/aizeNR/user-balance-service/internal/server/httprouter/v1/balance"
 	"github.com/aizeNR/user-balance-service/pkg/httpserver"
 	"github.com/aizeNR/user-balance-service/pkg/postgresql"
+	"github.com/aizeNR/user-balance-service/pkg/validator"
 	"github.com/rs/zerolog"
 )
 
@@ -54,7 +55,9 @@ func main() {
 
 	router := httprouter.Init()
 
-	balanceServer := balance.NewServer(ucBalance)
+	validate := validator.New()
+
+	balanceServer := balance.NewServer(ucBalance, validate)
 
 	balanceServer.Register(router)
 

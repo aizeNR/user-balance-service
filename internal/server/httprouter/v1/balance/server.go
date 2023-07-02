@@ -23,13 +23,19 @@ type balanceUseCase interface {
 	GetTransactions(ctx context.Context, r gettransactions.Request) (*gettransactions.Response, error)
 }
 
-type Server struct {
-	ucBalance balanceUseCase
+type validator interface {
+	StructCtx(ctx context.Context, s interface{}) (err error)
 }
 
-func NewServer(ucBalance balanceUseCase) *Server {
+type Server struct {
+	ucBalance balanceUseCase
+	validator validator
+}
+
+func NewServer(ucBalance balanceUseCase, validator validator) *Server {
 	return &Server{
 		ucBalance: ucBalance,
+		validator: validator,
 	}
 }
 

@@ -9,10 +9,10 @@ import (
 )
 
 type transferRequest struct {
-	RceiverID uint64 `json:"receiver_id"`
-	SenderID  uint64 `json:"sender_id"`
-	Amount    uint64 `json:"amount"`
-	Comment   string `json:"comment"`
+	RceiverID uint64 `json:"receiver_id" validate:"required"`
+	SenderID  uint64 `json:"sender_id" validate:"required"`
+	Amount    uint64 `json:"amount" validate:"required"`
+	Comment   string `json:"comment" validate:"required"`
 }
 
 func (s *Server) Transfer(w http.ResponseWriter, r *http.Request) {
@@ -23,11 +23,16 @@ func (s *Server) Transfer(w http.ResponseWriter, r *http.Request) {
 		httprouter.SendJSONError(w, err)
 		return
 	}
-	defer r.Body.Close()
 
-	// TODO validate.
+	ctx := r.Context()
 
-	if err := s.ucBalance.Transfer(r.Context(), transfer.Request{
+	err = s.validator.StructCtx(ctx, request)
+	if err != nil {
+		httprouter.SendValidationError(w, err)
+		return
+	}
+
+	if err := s.ucBalance.Transfer(ctx, transfer.Request{
 		ReceiverID: request.RceiverID,
 		SenderID:   request.SenderID,
 		Amount:     request.Amount,

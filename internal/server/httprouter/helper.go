@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/aizeNR/user-balance-service/internal/errx"
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -71,4 +72,23 @@ func SendJSONError(w http.ResponseWriter, err error) {
 
 	w.WriteHeader(httpErr.StatusCode())
 	w.Write(answer)
+}
+
+func SendValidationError(w http.ResponseWriter, err error) {
+	var validationErrors validator.ValidationErrors
+
+	if !errors.As(err, &validationErrors) {
+		SendJSONError(w, err)
+		return
+	}
+
+	fields := make(map[string]any, len(validationErrors))
+	for _, v := range validationErrors {
+		// TODO change message
+		fields[v.Field()] = v.Error()
+	}
+
+	SendJSONError(w, errx.ErrValidation{
+		Fields: fields,
+	})
 }
